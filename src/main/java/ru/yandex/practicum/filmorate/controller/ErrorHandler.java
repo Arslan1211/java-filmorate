@@ -15,43 +15,25 @@ import ru.yandex.practicum.filmorate.exception.user.UserNotFoundException;
 @RestControllerAdvice
 public class ErrorHandler {
 
-  @ExceptionHandler
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public ErrorResponse handleValidationException(final ValidationException e) {
-    return new ErrorResponse(e.getMessage());
-  }
-
-  @ExceptionHandler
+  @ExceptionHandler({
+      NotFoundException.class,
+      FilmNotFoundException.class,
+      UserNotFoundException.class
+  })
   @ResponseStatus(HttpStatus.NOT_FOUND)
-  public ErrorResponse handleNotFoundException(final NotFoundException e) {
+  public ErrorResponse handleNotFoundException(final RuntimeException e) {
     return new ErrorResponse(e.getMessage());
   }
 
   @ExceptionHandler({
       AlreadyLikedException.class,
+      AlreadyFriendException.class,
       LikeNotFoundException.class,
-      EmailAlreadyTakenException.class
+      EmailAlreadyTakenException.class,
+      ValidationException.class
   })
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ErrorResponse handleLikeException(final RuntimeException e) {
-    return new ErrorResponse(e.getMessage());
-  }
-
-  @ExceptionHandler
-  @ResponseStatus(HttpStatus.NOT_FOUND)
-  public ErrorResponse handleValidationException(final FilmNotFoundException e) {
-    return new ErrorResponse(e.getMessage());
-  }
-
-  @ExceptionHandler
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public ErrorResponse handleValidationException(final AlreadyFriendException e) {
-    return new ErrorResponse(e.getMessage());
-  }
-
-  @ExceptionHandler
-  @ResponseStatus(HttpStatus.NOT_FOUND)
-  public ErrorResponse handleValidationException(final UserNotFoundException e) {
     return new ErrorResponse(e.getMessage());
   }
 }
