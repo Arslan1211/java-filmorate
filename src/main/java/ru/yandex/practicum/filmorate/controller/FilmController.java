@@ -82,12 +82,12 @@ public class FilmController {
   }
 
   private void validate(Film film) throws ValidationException {
-    ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-    Validator validator = factory.getValidator();
-
-    Set<ConstraintViolation<Film>> violations = validator.validate(film);
-    if (!violations.isEmpty()) {
-      throw new ValidationException(violations.iterator().next().getMessage());
+    try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+      Validator validator = factory.getValidator();
+      Set<ConstraintViolation<Film>> violations = validator.validate(film);
+      if (!violations.isEmpty()) {
+        throw new ValidationException(violations.iterator().next().getMessage());
+      }
     }
   }
 }

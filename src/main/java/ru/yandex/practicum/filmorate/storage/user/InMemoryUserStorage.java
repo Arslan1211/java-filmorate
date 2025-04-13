@@ -4,18 +4,19 @@ import static java.util.Objects.isNull;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestBody;
+import ru.yandex.practicum.filmorate.exception.user.EmailAlreadyTakenException;
 import ru.yandex.practicum.filmorate.exception.user.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.validator.ValidationGroups;
 
 @Component
 public class InMemoryUserStorage implements UserStorage {
 
   private final Map<Long, User> users = new HashMap<>();
+  private final Set<String> emails = new HashSet<>();
   private Long idCounter = 1L;
 
   @Override
@@ -24,23 +25,30 @@ public class InMemoryUserStorage implements UserStorage {
   }
 
   @Override
-  public User create(@Validated(ValidationGroups.Create.class) @RequestBody User user) {
+  public User create(User user) {
+    if (emails.contains(user.getEmail())) {
+      throw new EmailAlreadyTakenException(user.getEmail());
+    }
+
     user.setId(idCounter++);
     if (isNull(user.getName())) {
       user.setName(user.getLogin());
     }
     users.put(user.getId(), user);
+    emails.add(user.getEmail());
     return user;
   }
 
   @Override
-  public User update(@Validated(ValidationGroups.Update.class) @RequestBody User user) {
+  public User update(User user) {
     Long id = user.getId();
 
-    if (user.getEmail() == null) {
+    if (isNull(user.getEmail())) {
       user.setEmail(users.get(id).getEmail());
     }
     users.put(user.getId(), user);
+    emails.remove(user.getEmail());
+    emails.add(user.getEmail());
     return user;
   }
 
