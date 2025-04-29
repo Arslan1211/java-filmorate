@@ -142,8 +142,8 @@ private final static Logger log = LoggerFactory.getLogger(Example.class);
 
 ```xml
 <dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-validation</artifactId>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-validation</artifactId>
 </dependency> 
 ```
 
@@ -232,17 +232,17 @@ public createUser(@Valid @RequestBody User user)
 
 - С помощью аннотации `@PathVariable` добавьте возможность получать каждый фильм и данные о пользователях по их уникальному идентификатору: `GET .../users/{id}`.
 - Добавьте методы, позволяющие пользователям добавлять друг друга в друзья, получать список общих друзей и лайкать фильмы. Проверьте, что все они работают корректно.
-    - `PUT /users/{id}/friends/{friendId}` — добавление в друзья.
-    - `DELETE /users/{id}/friends/{friendId}` — удаление из друзей.
-    - `GET /users/{id}/friends` — возвращаем список пользователей, являющихся его друзьями.
-    - `GET /users/{id}/friends/common/{otherId}` — список друзей, общих с другим пользователем.
-    - `PUT /films/{id}/like/{userId}` — пользователь ставит лайк фильму.
-    - `DELETE /films/{id}/like/{userId}` — пользователь удаляет лайк.
-    - `GET /films/popular?count={count}` — возвращает список из первых `count` фильмов по количеству лайков. Если значение параметра `count` не задано, верните первые 1010.
+  - `PUT /users/{id}/friends/{friendId}` — добавление в друзья.
+  - `DELETE /users/{id}/friends/{friendId}` — удаление из друзей.
+  - `GET /users/{id}/friends` — возвращаем список пользователей, являющихся его друзьями.
+  - `GET /users/{id}/friends/common/{otherId}` — список друзей, общих с другим пользователем.
+  - `PUT /films/{id}/like/{userId}` — пользователь ставит лайк фильму.
+  - `DELETE /films/{id}/like/{userId}` — пользователь удаляет лайк.
+  - `GET /films/popular?count={count}` — возвращает список из первых `count` фильмов по количеству лайков. Если значение параметра `count` не задано, верните первые 1010.
 - Убедитесь, что ваше приложение возвращает корректные HTTP-коды:
-    - 400400 — если ошибка валидации: `ValidationException`;
-    - 404404 — для всех ситуаций, если искомый объект не найден;
-    - 500500 — если возникло исключение.
+  - 400400 — если ошибка валидации: `ValidationException`;
+  - 404404 — для всех ситуаций, если искомый объект не найден;
+  - 500500 — если возникло исключение.
 
 <details>  
 <summary>Подсказка</summary>
@@ -260,9 +260,9 @@ public createUser(@Valid @RequestBody User user)
 
 ```XML
 <dependency>
-    <groupId>org.zalando</groupId>
-    <artifactId>logbook-spring-boot-starter</artifactId>
-    <version>3.7.2</version>
+  <groupId>org.zalando</groupId>
+  <artifactId>logbook-spring-boot-starter</artifactId>
+  <version>3.7.2</version>
 </dependency>
 ```
 
@@ -307,3 +307,271 @@ logging.level.org.zalando.logbook: TRACE
 
 Убедитесь, что приложение работает, — протестируйте его с помощью Postman: [postman.json](https://github.com/yandex-praktikum/java-filmorate/blob/add-friends-likes/postman/sprint.json).
 </details>
+
+<details>  
+<summary>Спринт 12</summary>
+
+<details>  
+<summary>Промежуточное задание</summary>
+
+# Техническое задание
+
+Спроектировать базу данных для проекта, основываясь на уже существующей функциональности.
+
+<details>  
+<summary>Описание таблиц базы данных фильмотеки</summary>
+
+
+## Таблица `films` (Фильмы)
+
+- `film_id` - уникальный идентификатор фильма (автоинкремент)
+
+- `name` - название фильма (обязательное поле)
+
+- `description` - описание фильма (максимум 200 символов)
+
+- `releaseDate` - дата выхода фильма
+
+- `duration` - длительность фильма в минутах
+
+- `rating` - рейтинг фильма (внешний ключ на таблицу ratings)
+
+
+## Таблица `users` (Пользователи)
+
+- `user_id` - уникальный идентификатор пользователя (автоинкремент)
+
+- `email` - электронная почта пользователя (уникальное, обязательное поле)
+
+- `login` - логин пользователя (уникальное, обязательное поле)
+
+- `name` - имя пользователя (обязательное поле)
+
+- `birthday` - дата рождения пользователя
+
+
+## Таблица `likes` (Лайки)
+
+- `like_id` - уникальный идентификатор лайка (автоинкремент)
+
+- `user_id` - идентификатор пользователя (внешний ключ на users)
+
+- `film_id` - идентификатор фильма (внешний ключ на films)
+
+
+## Таблица `friendships` (Дружба)
+
+- `id` - уникальный идентификатор дружбы (автоинкремент)
+
+- `user_id` - идентификатор пользователя (внешний ключ на users)
+
+- `friend_id` - идентификатор друга (внешний ключ на users)
+
+
+## Таблица `genres` (Жанры)
+
+- `genre_id` - уникальный идентификатор жанра (автоинкремент)
+
+- `name` - название жанра (уникальное, обязательное поле)
+
+
+## Таблица `film_genres` (Жанры фильмов)
+
+- `id` - уникальный идентификатор записи (автоинкремент)
+
+- `genre_id` - идентификатор жанра (внешний ключ на genres)
+
+- `film_id` - идентификатор фильма (внешний ключ на films)
+
+
+## Таблица `ratings` (Рейтинги)
+
+- `id` - уникальный идентификатор рейтинга (автоинкремент)
+
+- `name` - название рейтинга (уникальное, обязательное поле)
+</details>  
+
+
+<details>  
+<summary>Структура БД</summary>
+
+
+  ```sql
+  
+  Table films {
+  
+    film_id serial [primary key]
+  
+    name varchar [not null]
+  
+    description char(200)
+  
+    releaseDate date
+  
+    duration integer
+  
+    rating integer
+  
+  }
+  
+    
+  
+  Table users {
+  
+    user_id serial [primary key]
+  
+    email varchar [not null, unique]
+  
+    login varchar [not null, unique]
+  
+    name varchar [not null]
+  
+    birthday date
+  
+  }
+  
+    
+  
+  Table likes {
+  
+    like_id serial [primary key]
+  
+    user_id integer [not null]
+  
+    film_id integer [not null]
+  
+  }
+  
+    
+  
+  Table friendships {
+  
+    id serial [primary key]
+  
+    user_id integer [not null]
+  
+    friend_id integer [not null]
+  
+  }
+  
+    
+  
+  Table genres {
+  
+    genre_id serial [primary key]
+  
+    name varchar [not null, unique]
+  
+  }
+  
+    
+  
+  Table film_genres {
+  
+    id serial [primary key]
+  
+    genre_id integer [not null]
+  
+    film_id integer [not null]
+  
+  }
+  
+    
+  
+  Table ratings {
+  
+    id serial [primary key]
+  
+    name varchar [not null, unique]
+  
+  }
+  
+    
+  
+  Ref: films.rating > ratings.id
+  
+    
+  
+  Ref: likes.user_id > users.user_id
+  
+  Ref: likes.film_id > films.film_id
+  
+    
+  
+  Ref: friendships.user_id > users.user_id
+  
+  Ref: friendships.friend_id > users.user_id
+  
+    
+  
+  Ref: film_genres.genre_id > genres.genre_id
+  
+  Ref: film_genres.film_id > films.film_id
+  ```
+
+</details>  
+
+<details>  
+<summary>Создание таблиц</summary>
+
+```sql
+
+CREATE TABLE ratings (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR NOT NULL UNIQUE
+);
+
+CREATE TABLE users (
+    user_id SERIAL PRIMARY KEY,
+    email VARCHAR NOT NULL UNIQUE,
+    login VARCHAR NOT NULL UNIQUE,
+    name VARCHAR NOT NULL,
+    birthday DATE
+);
+
+CREATE TABLE films (
+    film_id SERIAL PRIMARY KEY,
+    name VARCHAR NOT NULL,
+    description CHAR(200),
+    releaseDate DATE,
+    duration INTEGER,
+    rating INTEGER,
+    CONSTRAINT fk_rating FOREIGN KEY (rating) REFERENCES ratings(id) ON DELETE SET NULL
+);
+
+CREATE TABLE genres (
+    genre_id SERIAL PRIMARY KEY,
+    name VARCHAR NOT NULL UNIQUE
+);
+
+CREATE TABLE likes (
+    like_id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    film_id INTEGER NOT NULL,
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    CONSTRAINT fk_film FOREIGN KEY (film_id) REFERENCES films(film_id) ON DELETE CASCADE
+);
+
+CREATE TABLE friendships (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    friend_id INTEGER NOT NULL,
+    CONSTRAINT fk_user1 FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    CONSTRAINT fk_user2 FOREIGN KEY (friend_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+CREATE TABLE film_genres (
+    id SERIAL PRIMARY KEY,
+    genre_id INTEGER NOT NULL,
+    film_id INTEGER NOT NULL,
+    CONSTRAINT fk_genre FOREIGN KEY (genre_id) REFERENCES genres(genre_id) ON DELETE CASCADE,
+    CONSTRAINT fk_film_genre FOREIGN KEY (film_id) REFERENCES films(film_id) ON DELETE CASCADE
+);
+```
+
+</details>  
+
+
+</details>
+
+</details>  
