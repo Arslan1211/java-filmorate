@@ -570,10 +570,10 @@ CREATE TABLE film_genres (
 ```
 
 </details>  
-</details>
 <details>  
 <summary>ER Diagramma</summary>
 
 ![er-diag.png](src/img/er-diag.png)
+</details>
 </details>
 </details>  
