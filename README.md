@@ -324,35 +324,36 @@ logging.level.org.zalando.logbook: TRACE
 
 ## Таблица `films` (Фильмы)
 
-- `film_id` - уникальный идентификатор фильма (автоинкремент)
+- `id` - уникальный идентификатор фильма (автоинкремент)
 
-- `name` - название фильма (обязательное поле)
+- `title` - название фильма (обязательное поле)
 
 - `description` - описание фильма (максимум 200 символов)
 
-- `releaseDate` - дата выхода фильма
+- `rating_id` - рейтинг фильма (внешний ключ на таблицу ratings)
+
+- `release_date` - дата выхода фильма
 
 - `duration` - длительность фильма в минутах
 
-- `rating` - рейтинг фильма (внешний ключ на таблицу ratings)
 
 
 ## Таблица `users` (Пользователи)
 
-- `user_id` - уникальный идентификатор пользователя (автоинкремент)
-
-- `email` - электронная почта пользователя (уникальное, обязательное поле)
+- `id` - уникальный идентификатор пользователя (автоинкремент)
 
 - `login` - логин пользователя (уникальное, обязательное поле)
 
-- `name` - имя пользователя (обязательное поле)
+- `username` - имя пользователя (обязательное поле)
+
+- `email` - электронная почта пользователя (уникальное, обязательное поле)
 
 - `birthday` - дата рождения пользователя
 
 
 ## Таблица `likes` (Лайки)
 
-- `like_id` - уникальный идентификатор лайка (автоинкремент)
+- `id` - уникальный идентификатор лайка (автоинкремент)
 
 - `user_id` - идентификатор пользователя (внешний ключ на users)
 
@@ -370,7 +371,7 @@ logging.level.org.zalando.logbook: TRACE
 
 ## Таблица `genres` (Жанры)
 
-- `genre_id` - уникальный идентификатор жанра (автоинкремент)
+- `id` - уникальный идентификатор жанра (автоинкремент)
 
 - `name` - название жанра (уникальное, обязательное поле)
 
@@ -379,9 +380,10 @@ logging.level.org.zalando.logbook: TRACE
 
 - `id` - уникальный идентификатор записи (автоинкремент)
 
+- `film_id` - идентификатор фильма (внешний ключ на films)
+
 - `genre_id` - идентификатор жанра (внешний ключ на genres)
 
-- `film_id` - идентификатор фильма (внешний ключ на films)
 
 
 ## Таблица `ratings` (Рейтинги)
@@ -393,183 +395,83 @@ logging.level.org.zalando.logbook: TRACE
 
 
 <details>  
-<summary>Структура БД</summary>
+<summary>Структура DBML</summary>
 
 
-  ```sql
-  
-  Table films {
-  
-    film_id serial [primary key]
-  
-    name varchar [not null]
-  
-    description char(200)
-  
-    releaseDate date
-  
-    duration integer
-  
-    rating integer
-  
-  }
-  
-    
-  
-  Table users {
-  
-    user_id serial [primary key]
-  
-    email varchar [not null, unique]
-  
-    login varchar [not null, unique]
-  
-    name varchar [not null]
-  
-    birthday date
-  
-  }
-  
-    
-  
-  Table likes {
-  
-    like_id serial [primary key]
-  
-    user_id integer [not null]
-  
-    film_id integer [not null]
-  
-  }
-  
-    
-  
-  Table friendships {
-  
-    id serial [primary key]
-  
-    user_id integer [not null]
-  
-    friend_id integer [not null]
-  
-  }
-  
-    
-  
-  Table genres {
-  
-    genre_id serial [primary key]
-  
-    name varchar [not null, unique]
-  
-  }
-  
-    
-  
-  Table film_genres {
-  
-    id serial [primary key]
-  
-    genre_id integer [not null]
-  
-    film_id integer [not null]
-  
-  }
-  
-    
-  
-  Table ratings {
-  
-    id serial [primary key]
-  
-    name varchar [not null, unique]
-  
-  }
-  
-    
-  
-  Ref: films.rating > ratings.id
-  
-    
-  
-  Ref: likes.user_id > users.user_id
-  
-  Ref: likes.film_id > films.film_id
-  
-    
-  
-  Ref: friendships.user_id > users.user_id
-  
-  Ref: friendships.friend_id > users.user_id
-  
-    
-  
-  Ref: film_genres.genre_id > genres.genre_id
-  
-  Ref: film_genres.film_id > films.film_id
+  ```sql  
+Table films {
+  id bigint [primary key]
+  title varchar(128) [not null]
+  description varchar(200)
+  release_date date
+  duration integer [not null]
+  rating_id integer [not null]
+}
   ```
 
-</details>  
+ ```sql  
+Table users {
+  id bigint [primary key]
+  email varchar(255) [not null, unique]
+  login varchar(32) [not null, unique]
+  username varchar(128) [not null]
+  birthday date
+}
+  ```
 
-<details>  
-<summary>Создание таблиц</summary>
+ ```sql  
+Table likes {
+  id bigint [primary key]
+  user_id bigint
+  film_id bigint
+}
+  ```
 
+ ```sql  
+Table friendships {
+  id bigint [primary key]
+  user_id bigint
+  friend_id bigint
+}
+  ```
+
+ ```sql  
+Table genres {
+  id smallint [primary key]
+  name varchar(64)
+}
+  ```
+
+ ```sql  
+Table film_genres {
+  id bigint [primary key]
+  film_id bigint 
+  genre_id smallint  
+}
+  ```
+
+ ```sql  
+Table ratings {
+  id smallint [primary key]
+  name varchar(5) 
+}
+  ```
 ```sql
+Ref: films.rating_id > ratings.id 
 
-CREATE TABLE ratings (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR NOT NULL UNIQUE
-);
+Ref: likes.user_id > users.id
+Ref: likes.film_id > films.id
 
-CREATE TABLE users (
-    user_id SERIAL PRIMARY KEY,
-    email VARCHAR NOT NULL UNIQUE,
-    login VARCHAR NOT NULL UNIQUE,
-    name VARCHAR NOT NULL,
-    birthday DATE
-);
+Ref: friendships.user_id > users.id 
+Ref: friendships.friend_id > users.id 
 
-CREATE TABLE films (
-    film_id SERIAL PRIMARY KEY,
-    name VARCHAR NOT NULL,
-    description CHAR(200),
-    releaseDate DATE,
-    duration INTEGER,
-    rating INTEGER,
-    CONSTRAINT fk_rating FOREIGN KEY (rating) REFERENCES ratings(id) ON DELETE SET NULL
-);
-
-CREATE TABLE genres (
-    genre_id SERIAL PRIMARY KEY,
-    name VARCHAR NOT NULL UNIQUE
-);
-
-CREATE TABLE likes (
-    like_id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL,
-    film_id INTEGER NOT NULL,
-    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    CONSTRAINT fk_film FOREIGN KEY (film_id) REFERENCES films(film_id) ON DELETE CASCADE
-);
-
-CREATE TABLE friendships (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL,
-    friend_id INTEGER NOT NULL,
-    CONSTRAINT fk_user1 FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    CONSTRAINT fk_user2 FOREIGN KEY (friend_id) REFERENCES users(user_id) ON DELETE CASCADE
-);
-
-CREATE TABLE film_genres (
-    id SERIAL PRIMARY KEY,
-    genre_id INTEGER NOT NULL,
-    film_id INTEGER NOT NULL,
-    CONSTRAINT fk_genre FOREIGN KEY (genre_id) REFERENCES genres(genre_id) ON DELETE CASCADE,
-    CONSTRAINT fk_film_genre FOREIGN KEY (film_id) REFERENCES films(film_id) ON DELETE CASCADE
-);
+Ref: film_genres.genre_id > genres.id
+Ref: film_genres.film_id > films.id 
 ```
-
 </details>  
+
+
+
 <details>  
 <summary>ER Diagramma</summary>
 
