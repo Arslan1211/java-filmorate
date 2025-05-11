@@ -14,4 +14,6 @@ public interface FilmStorage {
   Film update(Film film);
 
   Collection<Film> findBest(Long count);
+
+  void checkFilmExists(Long filmId);
 }

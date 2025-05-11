@@ -12,4 +12,16 @@ public interface UserStorage {
   User update(User user);
 
   User getById(Long id);
+
+  void checkUserExists(Long id);
+
+  void addFriend(Long id, Long friendId);
+
+  Collection<User> getFriendsOfUser(Long id);
+
+  Collection<User> getCommonFriends(Long id, Long otherId);
+
+  void removeFriend(Long id, Long friendId);
+
+  boolean isEmailUsed(String email);
 }
