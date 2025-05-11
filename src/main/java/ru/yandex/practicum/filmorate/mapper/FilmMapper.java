@@ -1,13 +1,12 @@
 package ru.yandex.practicum.filmorate.mapper;
 
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.FilmResponseDto;
 import ru.yandex.practicum.filmorate.dto.MpaDto;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
-
-import java.util.stream.Collectors;
 
 @UtilityClass
 public class FilmMapper {
@@ -42,7 +41,7 @@ public class FilmMapper {
         mpa,
         film.getGenres().stream()
             .map(GenreMapper::mapToGenreDto)
-            .collect(Collectors.toList())
+            .toList()
     );
   }
 }

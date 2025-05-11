@@ -2,45 +2,53 @@ package ru.yandex.practicum.filmorate.util;
 
 public interface SqlQueries {
 
-  String SQL_SELECT_ALL = """
+  /**
+   * Query User
+   */
+  String allUsers = """
       SELECT * FROM users
       """;
 
-  String SQL_INSERT_USER = """
+  String insertUser = """
       INSERT INTO users (login, username, email, birthday)
       VALUES (?, ?, ?, ?)
       """;
 
-  String SQL_UPDATE_USER = """
+  String updateUser = """
       UPDATE users
       SET login = ?, username = ?, email= ?,  birthday = ?
       WHERE id = ?
       """;
 
-  String SQL_SELECT_ONE = """
+  String byId = """
       SELECT * FROM users WHERE id = ?
       """;
 
-  String SQL_CHECK_FRIENDSHIP = """
+  String checkFriendship = """
       SELECT EXISTS (
           SELECT 1 FROM friendship
           WHERE user_id = ? AND friend_id = ?
       )
       """;
 
-  String SQL_ADD_FRIEND = """
+  String addFriend = """
       INSERT INTO friendship(user_id, friend_id)
       VALUES(?, ?)
       """;
 
-  String SQL_SELECT_FRIENDS = """
+  String removeFriend = """
+      DELETE FROM friendship
+      WHERE user_id = ? AND friend_id = ?
+      """;
+
+  String selectFriends = """
       SELECT u.*
       FROM users u
       JOIN friendship f ON u.id = f.friend_id
       WHERE f.user_id = ?;
       """;
 
-  String SQL_SELECT_COMMON_FRIENDS = """
+  String selectCommonFriends = """
       SELECT u.*
       FROM friendship f1
       JOIN friendship f2 ON f1.friend_id = f2.friend_id
@@ -49,40 +57,58 @@ public interface SqlQueries {
         AND f2.user_id = ?
       """;
 
-  String SQL_REMOVE_FRIEND = """
-      DELETE FROM friendship
-      WHERE user_id = ? AND friend_id = ?
-      """;
-
-  String SQL_CHECK_USER_EXISTS = """
+  String checkUserExists = """
       SELECT EXISTS(SELECT 1 FROM users WHERE id = ?)
       """;
 
-  String SQL_CHECK_EMAIL_USED = """
+  String checkEmailUsed = """
       SELECT EXISTS(SELECT 1 FROM users WHERE email = ?)
       """;
 
-  String SQL_CHECK_LIKE_EXISTS = """
-      SELECT COUNT(*) > 0 FROM likes WHERE film_id = ? AND user_id = ?
-      """;
 
-  String SQL_ADD_LIKE = """
-      INSERT INTO likes(film_id, user_id)
-      VALUES(?, ?)
-      """;
-  String SQL_REMOVE_LIKE = """
-      DELETE FROM likes
-      WHERE film_id = ? AND user_id = ?
-      """;
-  String SQL_SELECT_ALL_MPA = """
+  /**
+   * Query Mpa
+   */
+  String AllMpa = """
       SELECT * FROM mpa ORDER BY id
       """;
 
-  String SQL_SELECT_ONE_MPA = """
+  String byIdMpa = """
       SELECT * FROM mpa WHERE id = ?
       """;
 
-  String SQL_SELECT_ALL_FILM = """
+  /**
+   * Query Like
+   */
+  String checkLikeExists = """
+      SELECT COUNT(*) > 0 FROM likes WHERE film_id = ? AND user_id = ?
+      """;
+
+  String addLike = """
+      INSERT INTO likes(film_id, user_id)
+      VALUES(?, ?)
+      """;
+
+  String removeLike = """
+      DELETE FROM likes
+      WHERE film_id = ? AND user_id = ?
+      """;
+
+  /**
+   * Query Genre
+   */
+  String allGenre = """
+      SELECT * FROM genres ORDER BY id
+      """;
+
+  String byIdGenre = """
+      SELECT * FROM genres WHERE id = ?
+      """;
+
+  /**
+   * Query Film
+   */
+  String allFilms = """
       SELECT
           f.*,
           m.name AS mpa_name,
@@ -97,7 +123,7 @@ public interface SqlQueries {
       ORDER BY f.id;
       """;
 
-  String SQL_SELECT_ONE_FILM = """
+  String byIdFilm = """
       SELECT
           f.*,
           m.name AS mpa_name,
@@ -112,32 +138,32 @@ public interface SqlQueries {
       WHERE f.id = ?
       """;
 
-  String SQL_CHECK_FILM_EXISTS = """
+  String checkFilmExists = """
       SELECT COUNT(*) > 0 FROM films WHERE id = ?
       """;
 
-  String SQL_INSERT = """
+  String insertFilm = """
       INSERT INTO films (title, description, duration, release_date, mpa_id)
       VALUES (?, ?, ?, ?, ?)
       """;
 
-  String SQL_UPDATE_FILM = """
+  String updateFilm = """
       UPDATE films
       SET title = ?, description = ?, duration= ?,  release_date = ?, mpa_id = ?
       WHERE id = ?
       """;
 
-  String DELETE_FILM_GENRES = """
+  String deleteFilmGenre = """
       DELETE FROM film_genre
       WHERE film_id = ?
       """;
 
-  String INSERT_FILM_GENRE = """
+  String insertFilmGenre = """
       INSERT INTO film_genre(film_id, genre_id)
       VALUES (?, ?)
       """;
 
-  String SQL_SELECT_POPULAR = """
+  String popularFilm = """
       SELECT
           f.*,
           m.name AS mpa_name,
@@ -155,13 +181,5 @@ public interface SqlQueries {
          f.id, f.title, f.description, f.duration, f.release_date, f.mpa_id, m.name
       ORDER BY likes_count DESC
       LIMIT ?;
-      """;
-
-  String SQL_SELECT_ALL_GENRE = """
-      SELECT * FROM genres ORDER BY id
-      """;
-
-  String SQL_SELECT_ONE_GENRE = """
-      SELECT * FROM genres WHERE id = ?
       """;
 }

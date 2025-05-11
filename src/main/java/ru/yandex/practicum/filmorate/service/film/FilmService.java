@@ -1,6 +1,8 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.service.film;
 
+import java.util.Collection;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.FilmResponseDto;
@@ -11,65 +13,70 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 
-import java.util.Collection;
-import java.util.stream.Collectors;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FilmService {
+
   private final FilmStorage filmStorage;
   private final MpaStorage mpaStorage;
 
   public Collection<FilmResponseDto> getTop(int count) {
-    return filmStorage.getTop(count).stream()
+    return filmStorage.findBest(count).stream()
         .map(FilmMapper::mapToFilmDto)
-        .collect(Collectors.toList());
+        .toList();
   }
 
   public Collection<FilmResponseDto> getAll() {
-    return filmStorage.getAll().stream()
+    return filmStorage.findAll().stream()
         .map(FilmMapper::mapToFilmDto)
-        .collect(Collectors.toList());
+        .toList();
   }
 
   public FilmResponseDto getFilm(Long id) {
-    Film film = filmStorage.getFilm(id);
+    Film film = filmStorage.getById(id);
     return FilmMapper.mapToFilmDto(film);
   }
 
   public FilmResponseDto create(FilmDto filmDto) {
     Mpa mpa = mpaStorage.getMpa(filmDto.getMpa().getId());
 
-    System.out.println("filmDto = " + filmDto);
+    log.info("filmDto = " + filmDto);
     Film film = FilmMapper.mapToFilm(filmDto, mpa);
 
-    System.out.println("film = " + film);
-    Film created = filmStorage.save(film);
+    log.info("film = " + film);
+    Film created = filmStorage.create(film);
     return FilmMapper.mapToFilmDto(created);
   }
 
   public FilmResponseDto update(FilmDto film) {
 
-    Film origin = filmStorage.getFilm(film.getId());
-    if (film.getName() != null)
+    Film origin = filmStorage.getById(film.getId());
+    if (film.getName() != null) {
       origin.setName(film.getName());
+    }
 
-    if (film.getDuration() != null)
+    if (film.getDuration() != null) {
       origin.setDuration(film.getDuration());
+    }
 
-    if (film.getDescription() != null)
+    if (film.getDescription() != null) {
       origin.setDescription(film.getDescription());
+    }
 
-    if (film.getReleaseDate() != null)
+    if (film.getReleaseDate() != null) {
       origin.setReleaseDate(film.getReleaseDate());
+    }
 
-    if (film.getMpa() != null)
+    if (film.getMpa() != null) {
       origin.setMpa(mpaStorage.getMpa(film.getMpa().getId()));
+    }
 
-    if (film.getGenres() != null)
+    if (film.getGenres() != null) {
       origin.setGenres(film.getGenres().stream()
           .map(genreDto -> new Genre(genreDto.getId(), genreDto.getName()))
-          .collect(Collectors.toList()));
+          .toList());
+    }
 
     Film updated = filmStorage.update(origin);
     return FilmMapper.mapToFilmDto(updated);

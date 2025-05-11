@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.service.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.UserCreateDto;
 import ru.yandex.practicum.filmorate.dto.UserResponseDto;
 import ru.yandex.practicum.filmorate.dto.UserUpdateDto;
-import ru.yandex.practicum.filmorate.exception.EmailAlreadyTakenException;
+import ru.yandex.practicum.filmorate.exception.user.EmailAlreadyTakenException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
@@ -24,13 +24,13 @@ public class UserService {
   private final UserStorage userStorage;
 
   public Collection<UserResponseDto> getAll() {
-    return userStorage.getAll().stream()
+    return userStorage.findAll().stream()
         .map(UserMapper::mapToUserDto)
-        .collect(Collectors.toList());
+        .toList();
   }
 
   public UserResponseDto getUser(Long id) {
-    User found = userStorage.getUser(id);
+    User found = userStorage.getById(id);
     return UserMapper.mapToUserDto(found);
   }
 
@@ -40,15 +40,15 @@ public class UserService {
     }
 
     User userToCreate = UserMapper.mapToUser(userCreateDto);
-    User created = userStorage.save(userToCreate);
+    User created = userStorage.create(userToCreate);
     if (created == null)
-      throw new IllegalStateException("Failed to save data for new user");
-    log.info("User was created: {}", created);
+      throw new IllegalStateException("Не удалось сохранить данные для нового пользователя");
+    log.info("Пользователь успешно создан: {}", created);
     return UserMapper.mapToUserDto(created);
   }
 
   public UserResponseDto update(UserUpdateDto user) {
-    User origin = userStorage.getUser(user.getId());
+    User origin = userStorage.getById(user.getId());
 
     if (user.getEmail() != null && !user.getEmail().equals(origin.getEmail())) {
       if (userStorage.isEmailUsed(user.getEmail()))
@@ -102,7 +102,7 @@ public class UserService {
     Collection<UserResponseDto> friends = userStorage.getFriendsOfUser(id).stream()
         .map(UserMapper::mapToUserDto)
         .toList();
-    log.debug("User id:{} has {} friends", id, friends.size());
+    log.debug("Пользователь с идентификатором:{} имеет {} друзей", id, friends.size());
     return friends;
   }
 }

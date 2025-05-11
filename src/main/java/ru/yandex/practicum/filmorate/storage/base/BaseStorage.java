@@ -15,6 +15,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 public abstract class BaseStorage<T> {
+
   protected final JdbcTemplate jdbcTemplate;
   protected final RowMapper<T> rowMapper;
 

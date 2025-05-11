@@ -13,22 +13,21 @@ import ru.yandex.practicum.filmorate.util.SqlQueries;
 @Repository
 public class GenreDbStorage extends BaseStorage<Genre> implements GenreStorage {
 
-
-
   public GenreDbStorage(JdbcTemplate jdbcTemplate, GenreRowMapper rowMapper) {
     super(jdbcTemplate, rowMapper);
   }
 
   @Override
   public Collection<Genre> getAll() {
-    return getMany(SqlQueries.SQL_SELECT_ALL_GENRE);
+    return getMany(SqlQueries.allGenre);
   }
 
   @Override
   public Genre getGenre(Short id) {
-    Optional<Genre> one = getOne(SqlQueries.SQL_SELECT_ONE_GENRE, id);
-    if (one.isEmpty())
-      throw new NotFoundException("Genre id:" + id + " not found");
+    Optional<Genre> one = getOne(SqlQueries.byIdGenre, id);
+    if (one.isEmpty()) {
+      throw new NotFoundException("Genre id:" + id + " не найден");
+    }
     return one.get();
   }
 }

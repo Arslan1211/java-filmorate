@@ -19,14 +19,15 @@ public class MpaDbStorage extends BaseStorage<Mpa> implements MpaStorage {
 
   @Override
   public Collection<Mpa> getAll() {
-    return getMany(SqlQueries.SQL_SELECT_ALL_MPA);
+    return getMany(SqlQueries.AllMpa);
   }
 
   @Override
   public Mpa getMpa(Short id) {
-    Optional<Mpa> one = getOne(SqlQueries.SQL_SELECT_ONE_MPA, id);
-    if (one.isEmpty())
-      throw new NotFoundException("Mpa id:" + id + " not found");
+    Optional<Mpa> one = getOne(SqlQueries.byIdMpa, id);
+    if (one.isEmpty()) {
+      throw new NotFoundException("Mpa id:" + id + " не найден");
+    }
     return one.get();
   }
 }

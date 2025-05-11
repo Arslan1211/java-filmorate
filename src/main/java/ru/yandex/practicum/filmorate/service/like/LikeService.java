@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.service.like;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ public class LikeService {
     filmStorage.checkFilmExists(filmId);
 
     if (likeStorage.existsLike(filmId, userId)) {
-      throw new ValidationException("Film already liked by user");
+      throw new ValidationException("Фильм понравился пользователю");
     }
 
     likeStorage.save(filmId, userId);
@@ -32,7 +32,7 @@ public class LikeService {
     filmStorage.checkFilmExists(filmId);
 
     if (!likeStorage.existsLike(filmId, userId)) {
-      throw new ValidationException("Film was not liked by user");
+      throw new ValidationException("Фильм не понравился пользователю");
     }
 
     likeStorage.delete(filmId, userId);

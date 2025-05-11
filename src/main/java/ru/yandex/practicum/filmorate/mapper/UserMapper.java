@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.model.User;
 
 @UtilityClass
 public class UserMapper {
+
   public User mapToUser(UserCreateDto request) {
     User user = new User();
     user.setEmail(request.getEmail());
@@ -14,8 +15,9 @@ public class UserMapper {
     user.setBirthday(request.getBirthday());
     user.setName(request.getName());
 
-    if (user.getName() == null || user.getName().isBlank())
+    if (user.getName() == null || user.getName().isBlank()) {
       user.setName(user.getLogin());
+    }
 
     return user;
   }

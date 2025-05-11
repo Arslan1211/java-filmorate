@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.storage.base.BaseStorage;
 import ru.yandex.practicum.filmorate.util.SqlQueries;
 
-
 @Repository
 public class LikeDbStorage extends BaseStorage<Void> implements LikeStorage {
 
@@ -17,16 +16,16 @@ public class LikeDbStorage extends BaseStorage<Void> implements LikeStorage {
 
   @Override
   public void save(Long filmId, Long userId) {
-    jdbcTemplate.update(SqlQueries.SQL_ADD_LIKE, filmId, userId);
+    jdbcTemplate.update(SqlQueries.addLike, filmId, userId);
   }
 
   @Override
   public void delete(Long filmId, Long userId) {
-    jdbcTemplate.update(SqlQueries.SQL_REMOVE_LIKE, filmId, userId);
+    jdbcTemplate.update(SqlQueries.removeLike, filmId, userId);
   }
 
   @Override
   public boolean existsLike(Long filmId, Long userId) {
-    return exists(SqlQueries.SQL_CHECK_LIKE_EXISTS, filmId, userId);
+    return exists(SqlQueries.checkLikeExists, filmId, userId);
   }
 }

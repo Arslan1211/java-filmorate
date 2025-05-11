@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exception.AlreadyFriendException;
+import ru.yandex.practicum.filmorate.exception.friend.AlreadyFriendException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.base.BaseStorage;
@@ -19,13 +19,13 @@ public class UserDbStorage extends BaseStorage<User> implements UserStorage {
   }
 
   @Override
-  public Collection<User> getAll() {
-    return getMany(SqlQueries.SQL_SELECT_ALL);
+  public Collection<User> findAll() {
+    return getMany(SqlQueries.allUsers);
   }
 
   @Override
-  public User save(User user) {
-    Long id = insertAndReturnId(SqlQueries.SQL_INSERT_USER,
+  public User create(User user) {
+    Long id = insertAndReturnId(SqlQueries.insertUser,
         Long.class,
         user.getLogin(),
         user.getName(),
@@ -33,43 +33,47 @@ public class UserDbStorage extends BaseStorage<User> implements UserStorage {
         user.getBirthday()
     );
 
-    if (id == null)
+    if (id == null) {
       return null;
+    }
     user.setId(id);
     return user;
   }
 
   @Override
   public User update(User user) {
-    int updated = super.update(SqlQueries.SQL_UPDATE_USER,
+    int updated = super.update(SqlQueries.updateUser,
         user.getLogin(),
         user.getName(),
         user.getEmail(),
         user.getBirthday(),
         user.getId());
-    if (updated > 0)
+    if (updated > 0) {
       return user;
+    }
     return null;
   }
 
   @Override
   public void checkUserExists(Long id) throws NotFoundException {
-    boolean exists = exists(SqlQueries.SQL_CHECK_USER_EXISTS, id);
-    if (!exists)
+    boolean exists = exists(SqlQueries.checkUserExists, id);
+    if (!exists) {
       throw new NotFoundException("User id:" + id + " not found");
+    }
   }
 
   @Override
-  public User getUser(Long id) {
-    Optional<User> one = getOne(SqlQueries.SQL_SELECT_ONE, id);
-    if (one.isEmpty())
+  public User getById(Long id) {
+    Optional<User> one = getOne(SqlQueries.byId, id);
+    if (one.isEmpty()) {
       throw new NotFoundException("User id:" + id + " not found");
+    }
     return one.get();
   }
 
   @Override
   public boolean isEmailUsed(String email) {
-    return exists(SqlQueries.SQL_CHECK_EMAIL_USED, email);
+    return exists(SqlQueries.checkEmailUsed, email);
   }
 
   @Override
@@ -77,8 +81,7 @@ public class UserDbStorage extends BaseStorage<User> implements UserStorage {
     checkUserExists(id);
     checkUserExists(friendId);
 
-    Boolean alreadyAdded = jdbcTemplate.queryForObject(
-        SqlQueries.SQL_CHECK_FRIENDSHIP,
+    Boolean alreadyAdded = jdbcTemplate.queryForObject(SqlQueries.checkFriendship,
         Boolean.class,
         id,
         friendId
@@ -88,26 +91,26 @@ public class UserDbStorage extends BaseStorage<User> implements UserStorage {
       throw new AlreadyFriendException(id, friendId);
     }
 
-    int updatedRows = update(SqlQueries.SQL_ADD_FRIEND, id, friendId);
+    int updatedRows = update(SqlQueries.addFriend, id, friendId);
   }
 
   @Override
   public void removeFriend(Long id, Long friendId) {
     checkUserExists(id);
     checkUserExists(friendId);
-    int updatedRows = update(SqlQueries.SQL_REMOVE_FRIEND, id, friendId);
+    int updatedRows = update(SqlQueries.removeFriend, id, friendId);
   }
 
   @Override
   public Collection<User> getFriendsOfUser(Long id) {
     checkUserExists(id);
-    return getMany(SqlQueries.SQL_SELECT_FRIENDS, id);
+    return getMany(SqlQueries.selectFriends, id);
   }
 
   @Override
   public Collection<User> getCommonFriends(Long id, Long otherId) {
     checkUserExists(id);
     checkUserExists(otherId);
-    return getMany(SqlQueries.SQL_SELECT_COMMON_FRIENDS, id, otherId);
+    return getMany(SqlQueries.selectCommonFriends, id, otherId);
   }
 }

@@ -53,6 +53,6 @@ public class FilmRowMapper implements RowMapper<Film> {
         .map(info -> info.split(":"))
         .filter(parts -> parts.length == 2)
         .map(parts -> new Genre(Short.parseShort(parts[0]), parts[1]))
-        .collect(Collectors.toList());
+        .toList();
   }
 }
