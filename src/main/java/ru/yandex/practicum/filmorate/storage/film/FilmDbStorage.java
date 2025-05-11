@@ -25,8 +25,7 @@ public class FilmDbStorage extends BaseStorage<Film> implements FilmStorage {
 
   @Override
   public Collection<Film> findAll() {
-    Collection<Film> many = getMany(SqlQueries.allFilms);
-    return many;
+    return getMany(SqlQueries.allFilms);
   }
 
   @Override

@@ -37,10 +37,6 @@ public abstract class BaseStorage<T> {
     return jdbcTemplate.query(sql, rowMapper, args);
   }
 
-  protected int delete(String sql, Object... args) {
-    return jdbcTemplate.update(sql, args);
-  }
-
   protected int update(String sql, Object... args) {
     return jdbcTemplate.update(sql, args);
   }
