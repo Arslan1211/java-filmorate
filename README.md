@@ -470,8 +470,6 @@ Ref: film_genres.film_id > films.id
 ```
 </details>  
 
- 
-
 <details>  
 <summary>ER Diagramma</summary>
 

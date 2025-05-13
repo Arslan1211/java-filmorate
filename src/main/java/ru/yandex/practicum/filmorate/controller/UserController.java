@@ -1,21 +1,16 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import java.util.Collection;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.filmorate.model.User;
+import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.dto.UserCreateDto;
+import ru.yandex.practicum.filmorate.dto.UserResponseDto;
+import ru.yandex.practicum.filmorate.dto.UserUpdateDto;
 import ru.yandex.practicum.filmorate.service.user.UserService;
-import ru.yandex.practicum.filmorate.validator.ValidationGroups;
+
+import java.util.Collection;
 
 @Slf4j
 @RestController
@@ -25,29 +20,26 @@ public class UserController {
   private final UserService userService;
 
   @GetMapping("/users")
-  Collection<User> findAll() {
-    log.info("Получен HTTP-запрос на получение всех пользователей");
-    return userService.findAll();
+  Collection<UserResponseDto> getAll() {
+    return userService.getAll();
   }
 
   @GetMapping("/users/{id}")
-  User getById(@PathVariable Long id) {
-    log.info("Получен HTTP-запрос на получение пользователя по id: {}", id);
-    return userService.getById(id);
+  public UserResponseDto getUser(@PathVariable Long id) {
+    return userService.getUser(id);
   }
 
   @PostMapping("/users")
-  User create(@Validated(ValidationGroups.Create.class) @RequestBody User user) {
-    User created = userService.create(user);
-    log.info("Получен HTTP-запрос на создание пользователя: {}", user);
+  public UserResponseDto create(@Valid @RequestBody UserCreateDto user) {
+    UserResponseDto created = userService.create(user);
+    log.info("Пользователь с идентификатором:{} был добавлен: {}", created.getId(), created);
     return created;
   }
 
   @PutMapping("/users")
-  User update(@Validated(ValidationGroups.Update.class) @RequestBody User user) {
-    log.info("Получен HTTP-запрос на обновление пользователя: {}", user);
-    User updated = userService.update(user);
-    log.info("Успешно выполнен HTTP-запрос на обновление пользователя: {}", user);
+  public UserResponseDto update(@Valid @RequestBody UserUpdateDto user) {
+    UserResponseDto updated = userService.update(user);
+    log.info("Пользователь с идентификатором:{} был обновлен: {}", user.getId(), user);
     return updated;
   }
 
@@ -55,27 +47,26 @@ public class UserController {
   @ResponseStatus(HttpStatus.OK)
   public void addFriend(@PathVariable Long id, @PathVariable Long friendId) {
     userService.addFriend(id, friendId);
-    log.info("Пользователь с id:{} добавил в друзья пользователя с id:{}", id, friendId);
+    log.info("Пользователь с идентификатором:{} добавил друга с идентификатором:{}", id, friendId);
   }
 
   @DeleteMapping("/users/{id}/friends/{friendId}")
   @ResponseStatus(HttpStatus.OK)
   public void removeFriend(@PathVariable Long id, @PathVariable Long friendId) {
     userService.removeFriend(id, friendId);
-    log.info("Пользователь с id:{} удалил из друзей пользователя с id:{}", id, friendId);
+    log.info("Пользователь с идентификатором:{} удалил друга с идентификатором:{}", id, friendId);
   }
 
   @GetMapping("/users/{id}/friends")
   @ResponseStatus(HttpStatus.OK)
-  public Collection<User> getFriends(@PathVariable Long id) {
-    log.info("Получен HTTP-запрос на вывод всех друзей по id: {}", id);
+  public Collection<UserResponseDto> getFriends(@PathVariable Long id) {
     return userService.getFriends(id);
   }
 
   @GetMapping("/users/{id}/friends/common/{otherId}")
   @ResponseStatus(HttpStatus.OK)
-  public Collection<User> findCommonFriends(@PathVariable Long id, @PathVariable Long otherId) {
-    log.info("Получен HTTP-запрос на вывод общих друзей по id: {} {}", id, otherId);
-    return userService.findCommonFriends(id, otherId);
+  public Collection<UserResponseDto> getCommonFriends(@PathVariable Long id,
+      @PathVariable Long otherId) {
+    return userService.getCommonFriends(id, otherId);
   }
 }

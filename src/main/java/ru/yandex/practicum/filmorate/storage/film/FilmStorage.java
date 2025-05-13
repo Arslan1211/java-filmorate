@@ -1,7 +1,8 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
-import java.util.Collection;
 import ru.yandex.practicum.filmorate.model.Film;
+
+import java.util.Collection;
 
 public interface FilmStorage {
 
@@ -13,5 +14,7 @@ public interface FilmStorage {
 
   Film update(Film film);
 
-  Collection<Film> findBest(Long count);
+  Collection<Film> findBest(int count);
+
+  void checkFilmExists(Long filmId);
 }
